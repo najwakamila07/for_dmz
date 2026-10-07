@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DIMAZ RAMADANI ALFIANSYAH - Special Day</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 40%, #2f2229 0%, #1c141a 50%, #0d080c 100%);
+      color: #f7f1f5;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Canvas Efek Blink-Blink Berjatuhan dari Atas */
+    #snowCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Container Stage */
+    .stage {
+      position: relative;
+      width: 90%;
+      max-width: 650px;
+      z-index: 2;
+      padding: 30px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .slide {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Penempatan Nama Dimaz */
+    .person-name {
+      font-size: 0.82rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #ffd2e2;
+      margin-bottom: 6px;
+      font-weight: 600;
+      text-shadow: 0 0 12px rgba(255, 182, 193, 0.7);
+    }
+
+    .tagline {
+      font-size: 0.72rem;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: #e2c0cf;
+      margin-bottom: 12px;
+      opacity: 0.85;
+      font-weight: 500;
+    }
+
+    /* Judul dengan Efek Glowing / Nyala Seperti di Video */
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 3.4rem);
+      font-weight: 600;
+      line-height: 1.18;
+      margin-bottom: 8px;
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255, 230, 240, 0.9), 0 0 35px rgba(255, 175, 205, 0.55), 0 0 60px rgba(255, 105, 180, 0.3);
+      animation: softGlow 3s ease-in-out infinite alternate;
+    }
+
+    h1 span {
+      font-style: italic;
+      font-weight: 400;
+      color: #ffe6f0;
+      text-shadow: 0 0 20px rgba(255, 192, 203, 0.8);
+    }
+
+    @keyframes softGlow {
+      0% {
+        text-shadow: 0 0 15px rgba(255, 230, 240, 0.8), 0 0 30px rgba(255, 175, 205, 0.45);
+      }
+      100% {
+        text-shadow: 0 0 22px rgba(255, 255, 255, 1), 0 0 45px rgba(255, 182, 193, 0.75), 0 0 70px rgba(255, 105, 180, 0.4);
+      }
+    }
+
+    .subtext {
+      font-size: 0.88rem;
+      color: #c9b9c3;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      max-width: 440px;
+    }
+
+    /* Kotak Waktu Countdown */
+    .countdown-box {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      width: 100%;
+    }
+
+    .time-slot {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 16px 14px;
+      min-width: 72px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .time-slot span {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1;
+      margin-bottom: 6px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    }
+
+    .time-slot label {
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      color: #bfa7b4;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    /* Tombol Kapsul Elegan */
+    .btn-action {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f7f1f5;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 12px 30px;
+      border-radius: 35px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+    }
+
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.95);
+      color: #1a1017;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.25);
+    }
+
+    /* Kado */
+    .gift-interactive {
+      font-size: 4.8rem;
+      margin: 20px 0;
+      cursor: pointer;
+      animation: floatGift 2.5s ease-in-out infinite;
+      transition: transform 0.25s ease;
+    }
+
+    .gift-interactive:hover {
+      transform: scale(1.1) rotate(4deg);
+    }
+
+    @keyframes floatGift {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* Kartu Surat Kaca Buram */
+    .letter-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 32px 28px;
+      text-align: left;
+      font-size: 0.92rem;
+      line-height: 1.8;
+      color: #eddfe7;
+      margin-bottom: 28px;
+      max-height: 420px;
+      overflow-y: auto;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .letter-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .letter-card p {
+      margin-bottom: 15px;
+    }
+
+    /* Galeri Polaroid Rapi & Terkunci Proporsional */
+    .polaroid-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 440px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .polaroid-item {
+      background: #ffffff;
+      padding: 8px 8px 20px 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+      border-radius: 4px;
+      transform: rotate(var(--rot, 0deg));
+      transition: transform 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      height: 200px;
+      box-sizing: border-box;
+    }
+
+    .polaroid-item:hover {
+      transform: scale(1.04) rotate(0deg);
+      z-index: 5;
+    }
+
+    .polaroid-item img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+      border-radius: 2px;
+      background-color: #222;
+    }
+
+    /* Video Frame Kompak & Pas */
+    .video-wrapper {
+      width: 100%;
+      max-width: 420px;
+      max-height: 280px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 0 auto 24px auto;
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .video-wrapper video {
+      width: 100%;
+      max-height: 280px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .end-title {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Efek Partikel Blink-Blink Jatuh dari Atas -->
+  <canvas id="snowCanvas"></canvas>
+
+  <!-- Audio Background -->
+  <audio id="bgMusic" loop preload="auto" src="audio.mpeg"></audio>
+
+  <div class="stage">
+
+    <!-- SLIDE 1: COUNTDOWN -->
+    <section class="slide active" id="slide1">
+      <p class="person-name">DIMAZ RAMADANI ALFIANSYAH</p>
+      <p class="tagline"></p>
+      <h1>His Special Day<br><span>is Coming</span></h1>
+      <p class="subtext">sesuatu yang indah sedang menunggu untukmu sayang ✨</p>
+
+      <div class="countdown-box">
+        <div class="time-slot"><span id="days">00</span><label>Hari</label></div>
+        <div class="time-slot"><span id="hours">00</span><label>Jam</label></div>
+        <div class="time-slot"><span id="minutes">00</span><label>Menit</label></div>
+        <div class="time-slot"><span id="seconds">00</span><label>Detik</label></div>
+      </div>
+
+      <button class="btn-action" onclick="playMusicAndGo(2)">
+        <span>OPEN HIS GIFT</span> 🎁
+      </button>
+    </section>
+
+    <!-- SLIDE 2: KADO -->
+    <section class="slide" id="slide2">
+      <p class="tagline">✦ Ada Sesuatu Untukmu ✦</p>
+      <div class="gift-interactive" onclick="goToSlide(3)">
+        🎁
+      </div>
+      <p class="subtext">Klik kado di atas untuk membuka ucapan spesial ini ✨</p>
+    </section>
+
+    <!-- SLIDE 3: SURAT UCAPAN -->
+    <section class="slide" id="slide3">
+      <p class="tagline">✦ A Love Letter For You ✦</p>
+      <h1>Your Special Day</h1>
+      <div class="letter-card">
+        <h3>HAPPY BIRTHDAY SAYANGKU! 🤍</h3>
+        <p>
+         yeayyy selamat ulang tahun yang ke-19 yaaa sayangg!! akhirnyaaa tiba juga di hari dimana sayang dilahirkan
+        </p>
+        <p>
+         makasih yaa udah jadi orang yang selalu bikin aku nyaman. sama sayang aku bisa jadi diri aku sendiri, dan itu berarti banget buat aku. makasih juga udah selalu ada dan udah jadi bagian dari hari-hari aku sampai sekarang 🫶🏻
+        </p>
+        <p>
+          di umur yang baru ini, semoga sayang semakin dewasa, semakin tau mana yang baik dan nggak baik buat diri sendiri, dan jangan pernah capek buat terus jadi lebih baik. semoga selalu diberi kesehatan, panjang umur, rezekinya lancar, semua urusannya dimudahkan, dan semua doa serta cita-cita sayang bisa terwujud. aamiin 🤲🏻
+        </p>
+        <p>
+          semangat terus buat ngejar semua yang sayang pengenin yaa. jangan takut gagal, aku yakin sayang pasti bisa. aku bakal selalu dukung dan support sayang. selalu jadi anak baik, rendah hati, sayang sama keluarga, dan jangan lupa bersyukur yaa 🤍
+        </p>
+        <p>
+          maaf aku belum bisa selalu ada di samping sayang karena terhalang jarak. tapi aku selalu doain semoga sayang selalu dalam lindungan Allah. kalau sayang lagi capek atau butuh tempat buat cerita, inget yaa aku selalu ada di sini.
+        </p>
+        <p>
+          maaf ya sayang buat hadiahnya aku belum bisa kasih sekarang, tapi aku usahain yaa sayangg
+        </p>
+        <p>
+          sekali lagi HAPPY BIRTHDAYYY SAYANGKUUU!! 🥳🤍 semoga umur 19 ini jadi tahun yang penuh bahagia dan hal-hal baik buat sayang love youu sayanggg 🫶🏻
+        </p>
+      </div>
+      <button class="btn-action" onclick="goToSlide(4)">
+        <span>OUR MEMORIES</span> 📸
+      </button>
+    </section>
+
+    <!-- SLIDE 4: GALERI FOTO POLAROID (6 FOTO) -->
+    <section class="slide" id="slide4">
+      <p class="tagline">✦ Memories ✦</p>
+      <h1>Our Memories</h1>
+      <p class="subtext">Setiap detik berharga yang pernah kita lewati bersama 🤍</p>
+
+      <div class="polaroid-grid">
+        <div class="polaroid-item" style="--rot: -2deg;">
+          <img src="foto1.jpeg" alt="Memory 1">
+        </div>
+        <div class="polaroid-item" style="--rot: 2deg;">
+          <img src="foto2.jpeg" alt="Memory 2">
+        </div>
+        <div class="polaroid-item" style="--rot: -2deg;">
+          <img src="foto3.jpeg" alt="Memory 3">
+        </div>
+        <div class="polaroid-item" style="--rot: 1.5deg;">
+          <img src="foto4.jpeg" alt="Memory 4">
+        </div>
+        <div class="polaroid-item" style="--rot: -2deg;">
+          <img src="foto5.jpeg" alt="Memory 5">
+        </div>
+        <div class="polaroid-item" style="--rot: 2deg;">
+          <img src="foto6.jpeg" alt="Memory 6">
+        </div>
+      </div>
+
+      <button class="btn-action" onclick="goToSlide(5)">
+        <span>A MOMENT FOR YOU</span> 🎬
+      </button>
+    </section>
+
+    <!-- SLIDE 5: VIDEO -->
+    <section class="slide" id="slide5">
+      <p class="tagline">✦ Video Message ✦</p>
+      <h1>A Moment For You</h1>
+      <p class="subtext">Sebuah video kecil untuk mengingatkan betapa lucunya kita ✨</p>
+
+      <div class="video-wrapper">
+        <video id="specialVideo" controls playsinline>
+          <source src="video.mp4" type="video/mp4">
+          Browser kamu tidak mendukung video.
+        </video>
+      </div>
+
+      <button class="btn-action" onclick="goToSlide(6)">
+        <span> NEXT </span> ➜
+      </button>
+    </section>
+
+    <!-- SLIDE 6: PENUTUP -->
+    <section class="slide" id="slide6">
+      <p class="tagline">✦ With All My Love, Always ✦</p>
+      <h1 class="end-title"> HAPPY BIRTHDAY </h1>
+      <p class="subtext">
+        sekali lagi, happy birthday sayangkuu 🤍
+semoga semua doa dan harapan sayang satu-satu bisa terwujud.<br><br>
+      </p>
+      <button class="btn-action" onclick="goToSlide(1)">
+        <span>REPLAY FROM START</span> 🔄
+      </button>
+    </section>
+
+  </div>
+
+  <script>
+    // Animasi Blink-Blink Berjatuhan dari Atas
+    const canvas = document.getElementById("snowCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener("resize", () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    const particleCount = 55;
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 2 + 0.8,
+        speedY: Math.random() * 0.8 + 0.4,
+        speedX: Math.random() * 0.4 - 0.2,
+        opacity: Math.random() * 0.7 + 0.3,
+        pulseSpeed: Math.random() * 0.02 + 0.01
+      });
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach(p => {
+        p.y += p.speedY;
+        p.x += p.speedX;
+        p.opacity += Math.sin(Date.now() * p.pulseSpeed) * 0.01;
+
+        if (p.y > height) {
+          p.y = -5;
+          p.x = Math.random() * width;
+        }
+        if (p.x > width) p.x = 0;
+        if (p.x < 0) p.x = width;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 235, 245, ${Math.max(0.2, Math.min(1, p.opacity))})`;
+        ctx.shadowColor = "rgba(255, 210, 230, 0.8)";
+        ctx.shadowBlur = 8;
+        ctx.fill();
+      });
+
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // Logika Countdown Target
+    const targetDate = new Date("2026-10-08T00:00:00").getTime();
+
+    const countdownInterval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      if (distance < 0) {
+        clearInterval(countdownInterval);
+        document.getElementById("days").innerText = "00";
+        document.getElementById("hours").innerText = "00";
+        document.getElementById("minutes").innerText = "00";
+        document.getElementById("seconds").innerText = "00";
+        return;
+      }
+
+      const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = d < 10 ? "0" + d : d;
+      document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
+      document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
+      document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+    }, 1000);
+
+    const music = document.getElementById("bgMusic");
+
+    function playMusicAndGo(slideIndex) {
+      music.currentTime = 0;
+      const playPromise = music.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => console.log("Audio play error:", err));
+      }
+      goToSlide(slideIndex);
+    }
+
+    function goToSlide(slideIndex) {
+      if (music.paused) {
+        music.play().catch(() => {});
+      }
+
+      const vid = document.getElementById("specialVideo");
+      if (vid && !vid.paused) {
+        vid.pause();
+      }
+
+      const allSlides = document.querySelectorAll(".slide");
+      allSlides.forEach(s => s.classList.remove("active"));
+
+      const target = document.getElementById("slide" + slideIndex);
+      if (target) {
+        target.classList.add("active");
+      }
+    }
+  </script>
+</body>
+</html>
